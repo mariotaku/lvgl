@@ -1,8 +1,14 @@
 # Changelog
 
 ## v8.1.0 (In progress)
+- fix(docs) API colorwheel reference from 'lv_colorwheel_colour_set_mode...' to 'lv_colorwheel_set_mode...'
+- Fixed lv_deinit declaration when LV_USE_GPU_SDL is enabled
+- added sample lv_example_list_2.py
 - lv_obj_move_up(obj) and lv_obj_move_down(obj) added. (#2461)
-- lv_obj_swap(obj1, obj2) added. (#2461)
+- feat(example) stacked area chart lv_example_chart_8 added.
+- renamed lv_obj_get_child_id(obj) to lv_obj_get_index(obj).
+- added lv_obj_move_to_index(obj, index). (#2461)
+- redefined lv_obj_move_foreground(obj) and lv_obj_move_background(obj) as inline functions now calling lv_obj_move_to_index(obj, index).
 - feat(anim) add interface for handling lv_anim user data. (#2415)
 - feat(obj) add lv_is_initialized (#2402)
 - feat(obj) Backport keypad and encoder scrolling from v7 `lv_page` to v8 `lv_obj` (#2390)
@@ -19,10 +25,21 @@
 - feat(timer) check if lv_tick_inc is called <a href="https://github.com/lvgl/lvgl/commit/aa6641a6">aa6641a6</a> 
 - feat(docs) add view on GitHub link <a href="https://github.com/lvgl/lvgl/commit/a716ac6e">a716ac6e</a> 
 - feat(event) pass the scroll aniamtion to LV_EVENT_SCROLL_BEGIN <a href="https://github.com/lvgl/lvgl/commit/ca54ecfe">ca54ecfe</a> 
-
 - perf(draw) reimplement rectangle drawing algorithms 
 - perf(draw) reimplement circle drawing algorithms (#2374) (Also [change masking](https://docs.lvgl.io/master/overview/drawing.html#masking))
 - fix(draw) false assertion error in lv_draw_mask caused by wrong pointer
+- fix(color) Bad cast in lv_color_mix() caused UB with 16bpp or less
+- fix(examples) don't compile assets unless needed
+- docs(all) Proofread, fix typos and add clarifications in confusing areas
+- fix(zoom) multiplication overflow with zoom calculations on 16-bit platforms
+- feat(msgbox): omit title label unless needed
+- feat(msgbox): add function to get selected button index
+- fix(btnmatrix): make ORed values work correctly with lv_btnmatrix_has_btn_ctrl
+- fix(snapshot): snapshot is affected by parent's style because of wrong coordinates.
+- fix(disp) set default theme also for non-default displays
+- feat(btnmatrix/keyboard): add option to show popovers on button press
+- fix(types) LV_FORMAT_ATTRIBUTE now works with gnu version greater than 4.4
+- feat(event) add add LV_EVENT_CHILD_CREATED/DELETED
 
 ## v8.0.2 (16.07.2021)
 - fix(theme) improve button focus of keyboard
@@ -266,7 +283,7 @@ v8 is a major change and therefore it's not backward compatible with v7.
 ## v7.8.1 (15.12.2020)
 
 ### Bugfixes
-- fix(lv_scr_load_anim) fix when multiple screen are loaded at tsame time with delay
+- fix(lv_scr_load_anim) fix when multiple screens are loaded at the same time with delay
 - fix(page) fix LV_SCROLLBAR_MODE_DRAG
 
 ## v7.8.0 (01.12.2020)
@@ -300,7 +317,7 @@ v8 is a major change and therefore it's not backward compatible with v7.
 - fix(arc) fix and improve arc dragging
 - label: Repair calculate back `dot` character logical error which cause infinite loop.
 - fix(theme_material): remove the bottom border from tabview header
-- fix(imgbtn) guess a the closest available state with valid src
+- fix(imgbtn) guess the closest available state with valid src
 - fix(spinbox) update cursor position in lv_spinbox_set_step 
 
 ## v7.7.1 (03.11.2020)
