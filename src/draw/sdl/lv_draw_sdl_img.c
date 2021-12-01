@@ -14,9 +14,9 @@
 #include "../../draw/lv_draw_img.h"
 #include "../../draw/lv_img_cache.h"
 #include "../../draw/lv_draw_mask.h"
+#include "../../misc/lv_lru.h"
 
 #include "lv_draw_sdl_utils.h"
-#include "lv_draw_sdl_lru.h"
 #include "lv_draw_sdl_texture_cache.h"
 
 /*********************

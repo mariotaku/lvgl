@@ -85,6 +85,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
  */
 void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
 
+void _lv_draw_rect_bg_img(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
+
 /**********************
  *      MACROS
  **********************/

@@ -23,13 +23,22 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+struct lv_draw_nvg_context_states_t;
 struct lv_draw_nvg_context_userdata_t;
 struct lv_draw_nvg_context_t;
 
-typedef struct lv_draw_nvg_callbacks_t {
-    void (*set_offscreen)(struct lv_draw_nvg_context_t *context, bool offscreen);
+typedef enum lv_draw_nvg_buffer_index {
+    LV_DRAW_NVG_BUFFER_SCREEN = 0,
+    LV_DRAW_NVG_BUFFER_FRAME,
+    LV_DRAW_NVG_BUFFER_TEMP,
+    LV_DRAW_NVG_BUFFER_COUNT,
+} lv_draw_nvg_buffer_index;
 
-    void (*submit_buffer)(struct lv_draw_nvg_context_t *context);
+typedef struct lv_draw_nvg_callbacks_t {
+    void (*set_render_buffer)(struct lv_draw_nvg_context_t *context, lv_draw_nvg_buffer_index dst);
+
+    void (*submit_buffer)(struct lv_draw_nvg_context_t *context, lv_draw_nvg_buffer_index src, const lv_area_t *a,
+                          bool clear);
 
     void (*swap_window)(struct lv_draw_nvg_context_t *context);
 } lv_draw_nvg_callbacks_t;
@@ -37,17 +46,18 @@ typedef struct lv_draw_nvg_callbacks_t {
 typedef struct lv_draw_nvg_context_t {
     NVGcontext *nvg;
     lv_draw_nvg_callbacks_t callbacks;
-    bool frame_begun;
     struct lv_draw_nvg_context_userdata_t *userdata;
+    struct lv_draw_nvg_context_states_t *states;
 } lv_draw_nvg_context_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_nvg_init(lv_draw_backend_t *backend);
+void lv_draw_nvg_context_init(lv_draw_nvg_context_t *context, NVGcontext *nvg,
+                              const lv_draw_nvg_callbacks_t *callbacks);
 
-lv_draw_nvg_context_t *lv_draw_nvg_current_context();
+void lv_draw_nvg_init(lv_draw_backend_t *backend);
 
 /**********************
  *      MACROS

@@ -35,15 +35,27 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_nvg_label(const lv_point_t *pos_p, const lv_area_t *clip_area, const lv_font_t *font_p, uint32_t letter,
-                       lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode) {
+void lv_draw_nvg_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_area_t *clip,
+                         const lv_draw_rect_dsc_t *dsc) {
     lv_draw_nvg_context_t *ctx = lv_draw_nvg_current_context();
-//    lv_draw_nvg_ensure_frame(ctx);
+    lv_draw_nvg_ensure_frame(ctx);
 
-//    nvgBeginPath(ctx->nvg);
-//    nvgRect(ctx->nvg, coords->x1, coords->y1, lv_area_get_width(coords), lv_area_get_height(coords));
-//    nvgFillColor(ctx->nvg, nvgRGBA(dsc->bg_color.ch.red, dsc->bg_color.ch.green, dsc->bg_color.ch.blue, dsc->bg_opa));
-//    nvgFill(ctx->nvg);
+    nvgSave(ctx->nvg);
+
+    nvgReset(ctx->nvg);
+    nvgScissor(ctx->nvg, clip->x1, clip->y1, lv_area_get_width(clip), lv_area_get_height(clip));
+
+    nvgBeginPath(ctx->nvg);
+    nvgMoveTo(ctx->nvg, points[0].x, points[0].y);
+    for (int i = 1; i < point_cnt; i++) {
+        nvgLineTo(ctx->nvg, points[i].x, points[i].y);
+    }
+    nvgClosePath(ctx->nvg);
+
+    nvgFillColor(ctx->nvg, nvgRGBA(dsc->bg_color.ch.red, dsc->bg_color.ch.green, dsc->bg_color.ch.blue, dsc->bg_opa));
+    nvgFill(ctx->nvg);
+
+    nvgRestore(ctx->nvg);
 }
 
 /**********************

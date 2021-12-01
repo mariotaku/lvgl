@@ -291,6 +291,11 @@ bg_clean_up:
 #endif
 }
 
+void _lv_draw_rect_bg_img(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc)
+{
+    draw_bg_img(coords, clip, dsc);
+}
+
 LV_ATTRIBUTE_FAST_MEM static void draw_bg_img(const lv_area_t * coords, const lv_area_t * clip,
                                               const lv_draw_rect_dsc_t * dsc)
 {

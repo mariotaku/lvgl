@@ -1,0 +1,46 @@
+/**
+ * @file lv_draw_nvg_priv.h
+ *
+ */
+
+#ifndef LV_DRAW_NVG_PRIV_H
+#define LV_DRAW_NVG_PRIV_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*********************
+ *      INCLUDES
+ *********************/
+#include "../lv_draw.h"
+#include "lv_draw_nvg.h"
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+
+lv_draw_nvg_context_t *lv_draw_nvg_current_context();
+
+void lv_draw_nvg_ensure_frame(lv_draw_nvg_context_t *context);
+
+void lv_draw_nvg_push_frame(lv_draw_nvg_context_t *context, const lv_area_t *area);
+
+void lv_draw_nvg_end_frame(lv_draw_nvg_context_t *context);
+
+/**********************
+ *      MACROS
+ **********************/
+
+#ifdef __cplusplus
+} /*extern "C"*/
+#endif
+
+#endif /*LV_DRAW_NVG_PRIV_H*/

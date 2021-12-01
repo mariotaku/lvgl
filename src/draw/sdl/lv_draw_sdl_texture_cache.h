@@ -19,7 +19,7 @@ extern "C" {
 #include LV_GPU_SDL_INCLUDE_PATH
 #include "../../draw/lv_img_decoder.h"
 #include "../../misc/lv_area.h"
-#include "lv_draw_sdl_lru.h"
+#include "../../misc/lv_lru.h"
 
 /*********************
  *      DEFINES
