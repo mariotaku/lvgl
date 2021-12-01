@@ -15,7 +15,7 @@
  *      DEFINES
  *********************/
 
-#define FRAME_DEPTH_MAX 4
+#define FRAME_DEPTH_MAX 8
 
 void lv_draw_nvg_rect(const lv_area_t *coords, const lv_area_t *clip, const lv_draw_rect_dsc_t *dsc);
 
@@ -39,11 +39,14 @@ void lv_draw_nvg_polygon(const lv_point_t points[], uint16_t point_cnt, const lv
  **********************/
 typedef struct lv_draw_nvg_context_states_t {
     int frame_depth;
+    lv_draw_nvg_buffer_index frame_indices[FRAME_DEPTH_MAX];
     lv_area_t frame_areas[FRAME_DEPTH_MAX];
 } lv_draw_nvg_context_states_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
 
 /**********************
  *  STATIC VARIABLES
@@ -82,23 +85,20 @@ lv_draw_nvg_context_t *lv_draw_nvg_current_context() {
     return disp->driver->user_data;
 }
 
-void lv_draw_nvg_ensure_frame(lv_draw_nvg_context_t *context) {
-    lv_disp_t *disp = _lv_refr_get_disp_refreshing();
-    lv_draw_nvg_context_states_t *states = context->states;
-    if (states->frame_depth == 0) {
-//        context->callbacks.set_render_buffer(context, LV_DRAW_NVG_BUFFER_FRAME);
-        lv_area_t area = {0, 0, disp->driver->hor_res - 1, disp->driver->ver_res - 1};
-        lv_draw_nvg_push_frame(context, &area);
-    } else {
-        LV_ASSERT_MSG(states->frame_depth < 2, "Can perform this operation in nested state");
-    }
-}
-
-void lv_draw_nvg_push_frame(lv_draw_nvg_context_t *context, const lv_area_t *area) {
+void lv_draw_nvg_begin_frame(lv_draw_nvg_context_t *context, lv_draw_nvg_buffer_index index, bool clear) {
     lv_draw_nvg_context_states_t *states = context->states;
     LV_ASSERT(states->frame_depth < FRAME_DEPTH_MAX);
-    nvgBeginFrame(context->nvg, lv_area_get_width(area), lv_area_get_height(area), 1);
-    lv_memcpy(&states->frame_areas[states->frame_depth], area, sizeof(lv_area_t));
+    if (states->frame_depth > 0) {
+        if (states->frame_indices[states->frame_depth - 1] == index)
+            return;
+        nvgEndFrame(context->nvg);
+    }
+    lv_disp_t *disp = _lv_refr_get_disp_refreshing();
+    lv_area_t area = {0, 0, disp->driver->hor_res - 1, disp->driver->ver_res - 1};
+    context->callbacks.set_render_buffer(context, index, clear);
+    nvgBeginFrame(context->nvg, lv_area_get_width(&area), lv_area_get_height(&area), 1);
+    lv_memcpy(&states->frame_areas[states->frame_depth], &area, sizeof(lv_area_t));
+    states->frame_indices[states->frame_depth] = index;
     states->frame_depth++;
 }
 
@@ -109,9 +109,12 @@ void lv_draw_nvg_end_frame(lv_draw_nvg_context_t *context) {
     states->frame_depth--;
     if (states->frame_depth > 0) {
         const lv_area_t *area = &states->frame_areas[states->frame_depth - 1];
+        context->callbacks.set_render_buffer(context, states->frame_indices[states->frame_depth - 1], false);
         nvgBeginFrame(context->nvg, lv_area_get_width(area), lv_area_get_height(area), 1);
     }
 }
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+

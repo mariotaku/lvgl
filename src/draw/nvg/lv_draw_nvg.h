@@ -30,15 +30,17 @@ struct lv_draw_nvg_context_t;
 typedef enum lv_draw_nvg_buffer_index {
     LV_DRAW_NVG_BUFFER_SCREEN = 0,
     LV_DRAW_NVG_BUFFER_FRAME,
-    LV_DRAW_NVG_BUFFER_TEMP,
+    LV_DRAW_NVG_BUFFER_COMPOSITE,
+    LV_DRAW_NVG_BUFFER_MASK_DST,
+    LV_DRAW_NVG_BUFFER_MASK_SRC,
     LV_DRAW_NVG_BUFFER_COUNT,
 } lv_draw_nvg_buffer_index;
 
 typedef struct lv_draw_nvg_callbacks_t {
-    void (*set_render_buffer)(struct lv_draw_nvg_context_t *context, lv_draw_nvg_buffer_index dst);
+    void (*set_render_buffer)(struct lv_draw_nvg_context_t *context, lv_draw_nvg_buffer_index dst, bool clear);
 
-    void (*submit_buffer)(struct lv_draw_nvg_context_t *context, lv_draw_nvg_buffer_index src, const lv_area_t *a,
-                          bool clear);
+    void (*fill_buffer)(struct lv_draw_nvg_context_t *context, lv_draw_nvg_buffer_index src, const lv_area_t *a,
+                        bool clear);
 
     void (*swap_window)(struct lv_draw_nvg_context_t *context);
 } lv_draw_nvg_callbacks_t;

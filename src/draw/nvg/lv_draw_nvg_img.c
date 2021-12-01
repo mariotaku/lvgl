@@ -40,7 +40,7 @@ static int upload_img(NVGcontext *nvg, lv_img_decoder_dsc_t *dsc);
 lv_res_t lv_draw_nvg_img_core(const lv_area_t *coords, const lv_area_t *mask, const void *src,
                               const lv_draw_img_dsc_t *draw_dsc) {
     lv_draw_nvg_context_t *ctx = lv_draw_nvg_current_context();
-    lv_draw_nvg_ensure_frame(ctx);
+    lv_draw_nvg_begin_frame(ctx, LV_DRAW_NVG_BUFFER_FRAME, false);
 
     size_t key_size;
     lv_draw_sdl_cache_key_head_img_t *key = lv_nvg_img_cache_key_create(src, draw_dsc->frame_id, &key_size);

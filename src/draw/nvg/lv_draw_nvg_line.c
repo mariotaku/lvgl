@@ -11,6 +11,7 @@
 #include "../../core/lv_disp.h"
 #include "../../draw/lv_draw_rect.h"
 #include "lv_draw_nvg_priv.h"
+#include "lv_draw_nvg_mask.h"
 /*********************
  *      DEFINES
  *********************/
@@ -38,7 +39,10 @@
 void lv_draw_nvg_line(const lv_point_t *point1, const lv_point_t *point2, const lv_area_t *clip,
                       const lv_draw_line_dsc_t *dsc) {
     lv_draw_nvg_context_t *ctx = lv_draw_nvg_current_context();
-    lv_draw_nvg_ensure_frame(ctx);
+    lv_draw_nvg_begin_frame(ctx, LV_DRAW_NVG_BUFFER_FRAME, false);
+
+    // Draw background color
+    bool has_mask = lv_draw_nvg_mask_begin(ctx, clip);
 
     nvgSave(ctx->nvg);
 
@@ -54,6 +58,10 @@ void lv_draw_nvg_line(const lv_point_t *point1, const lv_point_t *point2, const 
     nvgStroke(ctx->nvg);
 
     nvgRestore(ctx->nvg);
+
+    if (has_mask) {
+        lv_draw_nvg_mask_end(ctx, clip);
+    }
 }
 
 /**********************

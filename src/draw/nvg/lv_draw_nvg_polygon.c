@@ -38,7 +38,7 @@
 void lv_draw_nvg_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_area_t *clip,
                          const lv_draw_rect_dsc_t *dsc) {
     lv_draw_nvg_context_t *ctx = lv_draw_nvg_current_context();
-    lv_draw_nvg_ensure_frame(ctx);
+    lv_draw_nvg_begin_frame(ctx, LV_DRAW_NVG_BUFFER_FRAME, false);
 
     nvgSave(ctx->nvg);
 

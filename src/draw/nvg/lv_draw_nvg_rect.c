@@ -43,11 +43,10 @@ static void rect_path(const lv_area_t *coords, const lv_draw_rect_dsc_t *dsc, lv
 
 void lv_draw_nvg_rect(const lv_area_t *coords, const lv_area_t *clip, const lv_draw_rect_dsc_t *dsc) {
     lv_draw_nvg_context_t *ctx = lv_draw_nvg_current_context();
-    lv_draw_nvg_ensure_frame(ctx);
+    lv_draw_nvg_begin_frame(ctx, LV_DRAW_NVG_BUFFER_FRAME, false);
 
     // Draw background color
     lv_area_t mask_area;
-
     bool has_mask = _lv_area_intersect(&mask_area, coords, clip) && lv_draw_nvg_mask_begin(ctx, &mask_area);
 
     nvgSave(ctx->nvg);
@@ -56,7 +55,7 @@ void lv_draw_nvg_rect(const lv_area_t *coords, const lv_area_t *clip, const lv_d
     nvgScissor(ctx->nvg, clip->x1, clip->y1, lv_area_get_width(clip), lv_area_get_height(clip));
 
     draw_bg(coords, dsc, ctx);
-//    _lv_draw_rect_bg_img(coords, clip, dsc);
+    _lv_draw_rect_bg_img(coords, clip, dsc);
     draw_border(coords, dsc, ctx);
 
     nvgRestore(ctx->nvg);

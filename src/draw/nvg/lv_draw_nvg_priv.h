@@ -29,9 +29,7 @@ extern "C" {
 
 lv_draw_nvg_context_t *lv_draw_nvg_current_context();
 
-void lv_draw_nvg_ensure_frame(lv_draw_nvg_context_t *context);
-
-void lv_draw_nvg_push_frame(lv_draw_nvg_context_t *context, const lv_area_t *area);
+void lv_draw_nvg_begin_frame(lv_draw_nvg_context_t *context, lv_draw_nvg_buffer_index index, bool clear);
 
 void lv_draw_nvg_end_frame(lv_draw_nvg_context_t *context);
 
