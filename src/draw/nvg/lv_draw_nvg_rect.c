@@ -59,24 +59,8 @@ void lv_draw_nvg_rect(const lv_area_t *coords, const lv_area_t *clip, const lv_d
     nvgSave(ctx->nvg);
 
     nvgReset(ctx->nvg);
-    lv_area_t scissor_clip = *clip;
-    if (!SKIP_SHADOW(dsc)) {
-        lv_coord_t size_grow = dsc->shadow_spread + dsc->shadow_width / 2;
-        lv_area_increase(&scissor_clip, size_grow, size_grow);
-        if (dsc->shadow_ofs_x > 0) {
-            scissor_clip.x2 += dsc->shadow_ofs_x;
-        } else {
-            scissor_clip.x1 -= dsc->shadow_ofs_x;
-        }
-        if (dsc->shadow_ofs_y > 0) {
-            scissor_clip.y2 += dsc->shadow_ofs_y;
-        } else {
-            scissor_clip.y1 -= dsc->shadow_ofs_y;
-        }
-    }
 
-    nvgScissor(ctx->nvg, scissor_clip.x1, scissor_clip.y1, lv_area_get_width(&scissor_clip),
-               lv_area_get_height(&scissor_clip));
+    nvgScissor(ctx->nvg, clip->x1, clip->y1, lv_area_get_width(clip), lv_area_get_height(clip));
 
     draw_shadow(coords, dsc, ctx);
 
@@ -169,19 +153,22 @@ static void draw_outline(const lv_area_t *coords, const lv_draw_rect_dsc_t *dsc,
 
 static void draw_shadow(const lv_area_t *coords, const lv_draw_rect_dsc_t *dsc, lv_draw_nvg_context_t *ctx) {
     if (SKIP_SHADOW(dsc)) return;
-    lv_coord_t w = lv_area_get_width(coords);
-    lv_coord_t h = lv_area_get_height(coords);
 
     lv_area_t shadow_coords = *coords;
-    lv_area_increase(&shadow_coords, dsc->shadow_spread, dsc->shadow_spread);
     lv_area_move(&shadow_coords, dsc->shadow_ofs_x, dsc->shadow_ofs_y);
+    lv_area_increase(&shadow_coords, dsc->shadow_spread, dsc->shadow_spread);
 
     NVGcolor shadow_color = nvgRGB(dsc->shadow_color.ch.red, dsc->shadow_color.ch.green, dsc->shadow_color.ch.blue);
-    NVGpaint paint = nvgBoxGradient(ctx->nvg, shadow_coords.x1, shadow_coords.y1, w, h, dsc->radius, dsc->shadow_width,
-                                    nvgTransRGBA(shadow_color, dsc->shadow_opa), nvgTransRGBA(shadow_color, 0));
+    NVGpaint paint = nvgBoxGradient(ctx->nvg, shadow_coords.x1, shadow_coords.y1, lv_area_get_width(&shadow_coords),
+                                    lv_area_get_height(&shadow_coords), dsc->radius, dsc->shadow_width,
+                                    nvgTransRGBA(shadow_color, dsc->shadow_opa),
+                                    nvgTransRGBA(shadow_color, 0));
+
+    lv_area_increase(&shadow_coords, dsc->shadow_width / 2, dsc->shadow_width / 2);
 
     nvgBeginPath(ctx->nvg);
-    nvgRect(ctx->nvg, shadow_coords.x1, shadow_coords.y1, w, h);
+    nvgRect(ctx->nvg, shadow_coords.x1, shadow_coords.y1, lv_area_get_width(&shadow_coords),
+            lv_area_get_height(&shadow_coords));
     nvgFillPaint(ctx->nvg, paint);
     nvgFill(ctx->nvg);
 }
