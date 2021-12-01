@@ -43,7 +43,6 @@ void lv_draw_nvg_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, 
 
     nvgSave(ctx->nvg);
 
-    nvgReset(ctx->nvg);
     nvgScissor(ctx->nvg, clip_area->x1, clip_area->y1, lv_area_get_width(clip_area), lv_area_get_height(clip_area));
 
     nvgBeginPath(ctx->nvg);

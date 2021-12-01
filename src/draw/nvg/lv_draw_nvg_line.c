@@ -46,7 +46,6 @@ void lv_draw_nvg_line(const lv_point_t *point1, const lv_point_t *point2, const 
 
     nvgSave(ctx->nvg);
 
-    nvgReset(ctx->nvg);
     nvgScissor(ctx->nvg, clip->x1, clip->y1, lv_area_get_width(clip), lv_area_get_height(clip));
 
     nvgBeginPath(ctx->nvg);

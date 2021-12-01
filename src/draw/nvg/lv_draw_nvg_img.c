@@ -81,7 +81,6 @@ lv_res_t lv_draw_nvg_img_core(const lv_area_t *coords, const lv_area_t *mask, co
 
     nvgSave(ctx->nvg);
 
-    nvgReset(ctx->nvg);
     nvgScissor(ctx->nvg, mask->x1, mask->y1, lv_area_get_width(mask), lv_area_get_height(mask));
 
     nvgTranslate(ctx->nvg, coords->x1 + draw_dsc->pivot.x, coords->y1 + draw_dsc->pivot.y);

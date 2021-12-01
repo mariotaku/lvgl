@@ -58,8 +58,6 @@ void lv_draw_nvg_rect(const lv_area_t *coords, const lv_area_t *clip, const lv_d
 
     nvgSave(ctx->nvg);
 
-    nvgReset(ctx->nvg);
-
     nvgScissor(ctx->nvg, clip->x1, clip->y1, lv_area_get_width(clip), lv_area_get_height(clip));
 
     draw_shadow(coords, dsc, ctx);

@@ -42,7 +42,6 @@ void lv_draw_nvg_polygon(const lv_point_t points[], uint16_t point_cnt, const lv
 
     nvgSave(ctx->nvg);
 
-    nvgReset(ctx->nvg);
     nvgScissor(ctx->nvg, clip->x1, clip->y1, lv_area_get_width(clip), lv_area_get_height(clip));
 
     nvgBeginPath(ctx->nvg);

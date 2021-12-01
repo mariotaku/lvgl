@@ -96,7 +96,6 @@ void lv_draw_nvg_label(const lv_point_t *pos_p, const lv_area_t *clip_area, cons
 
     nvgSave(ctx->nvg);
 
-    nvgReset(ctx->nvg);
     nvgScissor(ctx->nvg, clip_area->x1, clip_area->y1, lv_area_get_width(clip_area), lv_area_get_height(clip_area));
 
     nvgBeginPath(ctx->nvg);
