@@ -39,6 +39,7 @@ typedef struct {
 
 typedef enum {
     LV_GPU_CACHE_KEY_MAGIC_IMG = 0x01,
+    LV_GPU_CACHE_KEY_MAGIC_GLYPH = 0x02,
     LV_GPU_CACHE_KEY_TEMP = 0xFF,
 } lv_gpu_cache_key_magic_t;
 
@@ -71,6 +72,8 @@ void lv_nvg_draw_cache_put_advanced(const void *key, size_t key_length, int img,
                                     lv_lru_free_t userdata_free, lv_draw_sdl_cache_flag_t flags);
 
 lv_draw_sdl_cache_key_head_img_t *lv_nvg_img_cache_key_create(const void *src, int32_t frame_id, size_t *size);
+
+int lv_nvg_create_alpha_image(lv_opa_t * pixels, lv_coord_t width, lv_coord_t height);
 
 /**********************
  *      MACROS

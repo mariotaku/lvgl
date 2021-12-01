@@ -67,6 +67,8 @@ void lv_blend_sw_map(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_are
                      const lv_color_t * src_buf, const lv_area_t * src_area,
                      lv_opa_t * mask, lv_opa_t opa, lv_blend_mode_t mode);
 
+void lv_draw_sw_nbpp_to_opa(lv_opa_t * dest, const uint8_t * src, int width, int height, int stride, uint8_t bpp);
+
 /***********************
  * GLOBAL VARIABLES
  ***********************/

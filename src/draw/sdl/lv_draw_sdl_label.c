@@ -13,6 +13,7 @@
 
 #include "../../draw/lv_draw_label.h"
 #include "../../draw/lv_draw_mask.h"
+#include "../../draw/sw/lv_draw_sw.h"
 #include "../../misc/lv_utils.h"
 
 #include LV_GPU_SDL_INCLUDE_PATH
@@ -108,7 +109,7 @@ void lv_draw_sdl_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_ar
         }
         const uint8_t * bmp = lv_font_get_glyph_bitmap(font_p, letter);
         uint8_t * buf = lv_mem_alloc(g.box_w * g.box_h);
-        lv_sdl_to_8bpp(buf, bmp, g.box_w, g.box_h, g.box_w, g.bpp);
+        lv_draw_sw_nbpp_to_opa(buf, bmp, g.box_w, g.box_h, g.box_w, g.bpp);
         SDL_Surface * mask = lv_sdl_create_mask_surface(buf, g.box_w, g.box_h, g.box_w);
         texture = SDL_CreateTextureFromSurface(renderer, mask);
         SDL_FreeSurface(mask);

@@ -10,6 +10,7 @@
 #include "../../core/lv_disp.h"
 #include "lv_draw_nvg_priv.h"
 #include "lv_draw_nvg_img_cache.h"
+#include "lv_draw_nvg_mask.h"
 /*********************
  *      DEFINES
  *********************/
@@ -74,6 +75,10 @@ lv_res_t lv_draw_nvg_img_core(const lv_area_t *coords, const lv_area_t *mask, co
         return LV_RES_INV;
     }
 
+    // Draw background color
+    lv_area_t mask_area;
+    bool has_mask = _lv_area_intersect(&mask_area, coords, mask) && lv_draw_nvg_mask_begin(ctx, &mask_area);
+
     nvgSave(ctx->nvg);
 
     nvgReset(ctx->nvg);
@@ -93,11 +98,22 @@ lv_res_t lv_draw_nvg_img_core(const lv_area_t *coords, const lv_area_t *mask, co
         nvgScale(ctx->nvg, scale, scale);
     }
     nvgImageSize(ctx->nvg, img, &iw, &ih);
-    nvgFillPaint(ctx->nvg, nvgImagePattern(ctx->nvg, -draw_dsc->pivot.x, -draw_dsc->pivot.y, iw, ih, 0, img,
-                                           draw_dsc->opa / 255.0f));
+    NVGpaint paint = nvgImagePattern(ctx->nvg, -draw_dsc->pivot.x, -draw_dsc->pivot.y, iw, ih, 0, img,
+                                     draw_dsc->opa / 255.0f);
+    if (draw_dsc->recolor_opa > 0) {
+        paint.innerColor = paint.outerColor = nvgRGBA(draw_dsc->recolor.ch.red, draw_dsc->recolor.ch.green,
+                                                      draw_dsc->recolor.ch.blue, draw_dsc->recolor_opa);
+    } else {
+        paint.innerColor = paint.outerColor = nvgRGBA(255, 255, 255, 255);
+    }
+    nvgFillPaint(ctx->nvg, paint);
     nvgFill(ctx->nvg);
 
     nvgRestore(ctx->nvg);
+
+    if (has_mask) {
+        lv_draw_nvg_mask_end(ctx, &mask_area);
+    }
     return LV_RES_OK;
 }
 

@@ -5,7 +5,6 @@
 #include "lv_draw_nvg_mask.h"
 #include "lv_draw_nvg_priv.h"
 
-#include "../lv_draw_mask.h"
 #include "../../misc/lv_gc.h"
 
 static void mask_apply_fade(NVGcontext *nvg, const lv_draw_mask_fade_param_t *param);
@@ -16,88 +15,33 @@ static void mask_apply_line(NVGcontext *nvg, const lv_draw_mask_line_param_t *pa
 
 static void mask_apply_angle(NVGcontext *nvg, const lv_draw_mask_angle_param_t *param, const lv_area_t *a);
 
+static void render_texture_mask(lv_draw_nvg_context_t *ctx, const lv_area_t *a);
+
 
 bool lv_draw_nvg_mask_begin(lv_draw_nvg_context_t *ctx, const lv_area_t *a) {
     if (!lv_draw_mask_is_any(a)) {
         return false;
     }
-    // Set render target to composite buffer
+
+    render_texture_mask(ctx, a);
+
     lv_draw_nvg_begin_frame(ctx, LV_DRAW_NVG_BUFFER_COMPOSITE, true);
     return true;
 }
 
 void lv_draw_nvg_mask_end(lv_draw_nvg_context_t *ctx, const lv_area_t *a) {
-    // Set render target to texture buffer
-    bool any_applied = false;
-    for (uint8_t i = 0; i < _LV_MASK_MAX_NUM; i++) {
-        _lv_draw_mask_common_dsc_t *comm_param = LV_GC_ROOT(_lv_draw_mask_list[i]).param;
-        if (comm_param == NULL) continue;
-        bool first = !any_applied, handled = false, inverted = false;
-        lv_draw_nvg_begin_frame(ctx, LV_DRAW_NVG_BUFFER_MASK_SRC, true);
-        switch (comm_param->type) {
-            case LV_DRAW_MASK_TYPE_LINE: {
-                const lv_draw_mask_line_param_t *param = (const lv_draw_mask_line_param_t *) comm_param;
-                mask_apply_line(ctx->nvg, param, a);
-                any_applied = true;
-                handled = true;
-                break;
-            }
-            case LV_DRAW_MASK_TYPE_RADIUS: {
-                const lv_draw_mask_radius_param_t *param = (const lv_draw_mask_radius_param_t *) comm_param;
-                inverted = param->cfg.outer;
-                mask_apply_radius(ctx->nvg, param, a);
-                any_applied = true;
-                handled = true;
-                break;
-            }
-            case LV_DRAW_MASK_TYPE_FADE: {
-                const lv_draw_mask_fade_param_t *param = (const lv_draw_mask_fade_param_t *) comm_param;
-                mask_apply_fade(ctx->nvg, param);
-                any_applied = true;
-                handled = true;
-                break;
-            }
-            case LV_DRAW_MASK_TYPE_ANGLE: {
-                const lv_draw_mask_angle_param_t *param = (const lv_draw_mask_angle_param_t *) comm_param;
-                mask_apply_angle(ctx->nvg, param, a);
-                any_applied = true;
-                handled = true;
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-        lv_draw_nvg_end_frame(ctx);
-        if (handled) {
-            lv_draw_nvg_begin_frame(ctx, LV_DRAW_NVG_BUFFER_MASK_DST, false);
-            if (inverted) {
-                if (first) {
-                    nvgBeginPath(ctx->nvg);
-                    nvgRect(ctx->nvg, a->x1, a->y1, lv_area_get_width(a), lv_area_get_height(a));
-                    nvgFillColor(ctx->nvg, nvgRGBA(0, 255, 255, 255));
-                    nvgFill(ctx->nvg);
-                }
-                nvgGlobalCompositeOperation(ctx->nvg, NVG_DESTINATION_OUT);
-            } else if (first) {
-                nvgGlobalCompositeOperation(ctx->nvg, NVG_SOURCE_OVER);
-            } else {
-                nvgGlobalCompositeOperation(ctx->nvg, NVG_DESTINATION_IN);
-            }
-            // Blend composited onto frame
-            ctx->callbacks.fill_buffer(ctx, LV_DRAW_NVG_BUFFER_MASK_SRC, NULL, false);
-            lv_draw_nvg_end_frame(ctx);
-        }
-    }
-    // Blend mask onto composite
-    nvgGlobalCompositeOperation(ctx->nvg, NVG_DESTINATION_IN);
-    ctx->callbacks.fill_buffer(ctx, LV_DRAW_NVG_BUFFER_MASK_DST, NULL, false);
+    // Apply mask to composited
+    nvgGlobalCompositeBlendFuncSeparate(ctx->nvg, NVG_ZERO, NVG_ONE, NVG_ZERO, NVG_SRC_ALPHA);
+    ctx->callbacks.fill_buffer(ctx, LV_DRAW_NVG_BUFFER_MASK, NULL, false);
 
     // Restore to last buffer (expect frame)
     lv_draw_nvg_end_frame(ctx);
 
+    nvgSave(ctx->nvg);
+    nvgScissor(ctx->nvg, a->x1, a->y1, lv_area_get_width(a), lv_area_get_height(a));
     // Blend composited onto frame
     ctx->callbacks.fill_buffer(ctx, LV_DRAW_NVG_BUFFER_COMPOSITE, NULL, false);
+    nvgRestore(ctx->nvg);
 }
 
 static void mask_apply_fade(NVGcontext *nvg, const lv_draw_mask_fade_param_t *param) {
@@ -157,4 +101,73 @@ static void mask_apply_angle(NVGcontext *nvg, const lv_draw_mask_angle_param_t *
            nvgDegToRad(param->cfg.end_angle), NVG_CW);
     nvgFillColor(nvg, nvgRGBA(0, 0, 255, 255));
     nvgFill(nvg);
+}
+
+static void render_texture_mask(lv_draw_nvg_context_t *ctx, const lv_area_t *a) {
+    bool any_applied = false;
+    for (uint8_t i = 0; i < _LV_MASK_MAX_NUM; i++) {
+        _lv_draw_mask_common_dsc_t *comm_param = LV_GC_ROOT(_lv_draw_mask_list[i]).param;
+        if (comm_param == NULL) continue;
+        bool first = !any_applied, handled = false, inverted = false;
+        lv_draw_nvg_begin_frame(ctx, LV_DRAW_NVG_BUFFER_MASK, true);
+        switch (comm_param->type) {
+            case LV_DRAW_MASK_TYPE_LINE: {
+                const lv_draw_mask_line_param_t *param = (const lv_draw_mask_line_param_t *) comm_param;
+                mask_apply_line(ctx->nvg, param, a);
+                any_applied = true;
+                handled = true;
+                break;
+            }
+            case LV_DRAW_MASK_TYPE_RADIUS: {
+                const lv_draw_mask_radius_param_t *param = (const lv_draw_mask_radius_param_t *) comm_param;
+                inverted = param->cfg.outer;
+                mask_apply_radius(ctx->nvg, param, a);
+                any_applied = true;
+                handled = true;
+                break;
+            }
+            case LV_DRAW_MASK_TYPE_FADE: {
+                const lv_draw_mask_fade_param_t *param = (const lv_draw_mask_fade_param_t *) comm_param;
+                mask_apply_fade(ctx->nvg, param);
+                any_applied = true;
+                handled = true;
+                break;
+            }
+            case LV_DRAW_MASK_TYPE_ANGLE: {
+                const lv_draw_mask_angle_param_t *param = (const lv_draw_mask_angle_param_t *) comm_param;
+                mask_apply_angle(ctx->nvg, param, a);
+                any_applied = true;
+                handled = true;
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+        lv_draw_nvg_end_frame(ctx);
+        if (handled) {
+            lv_draw_nvg_begin_frame(ctx, LV_DRAW_NVG_BUFFER_COMPOSITE, first);
+            if (inverted) {
+                if (first) {
+                    nvgBeginPath(ctx->nvg);
+                    nvgRect(ctx->nvg, a->x1, a->y1, lv_area_get_width(a), lv_area_get_height(a));
+                    nvgFillColor(ctx->nvg, nvgRGBA(0, 255, 255, 255));
+                    nvgFill(ctx->nvg);
+                }
+                nvgGlobalCompositeOperation(ctx->nvg, NVG_DESTINATION_OUT);
+            } else if (first) {
+                nvgGlobalCompositeOperation(ctx->nvg, NVG_SOURCE_OVER);
+            } else {
+                nvgGlobalCompositeOperation(ctx->nvg, NVG_DESTINATION_IN);
+            }
+            // Blend composited onto frame
+            ctx->callbacks.fill_buffer(ctx, LV_DRAW_NVG_BUFFER_MASK, NULL, false);
+            lv_draw_nvg_end_frame(ctx);
+        }
+    }
+
+    // Overwrite mask with composite
+    lv_draw_nvg_begin_frame(ctx, LV_DRAW_NVG_BUFFER_MASK, true);
+    ctx->callbacks.fill_buffer(ctx, LV_DRAW_NVG_BUFFER_COMPOSITE, NULL, false);
+    lv_draw_nvg_end_frame(ctx);
 }

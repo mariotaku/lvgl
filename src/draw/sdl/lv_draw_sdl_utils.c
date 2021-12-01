@@ -102,11 +102,6 @@ void lv_area_zoom_to_sdl_rect(const lv_area_t * in, SDL_Rect * out, uint16_t zoo
     out->h = sh;
 }
 
-double lv_sdl_round(double d)
-{
-    return (d - (long) d) < 0.5 ? SDL_floor(d) : SDL_ceil(d);
-}
-
 SDL_Palette * lv_sdl_alloc_palette_for_bpp(const uint8_t * mapping, uint8_t bpp)
 {
     SDL_assert(bpp >= 1 && bpp <= 8);
@@ -145,46 +140,6 @@ SDL_Palette * lv_sdl_get_grayscale_palette(uint8_t bpp)
     }
     LV_ASSERT_MSG(lv_sdl_palette_grayscale8, "lv_draw_sdl was not initialized properly");
     return palette;
-}
-
-void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, int stride, uint8_t bpp)
-{
-    int src_len = width * height;
-    int cur = 0;
-    int curbit;
-    uint8_t opa_mask;
-    const uint8_t * opa_table;
-    switch(bpp) {
-        case 1:
-            opa_mask = 0x1;
-            opa_table = _lv_bpp1_opa_table;
-            break;
-        case 2:
-            opa_mask = 0x4;
-            opa_table = _lv_bpp2_opa_table;
-            break;
-        case 4:
-            opa_mask = 0xF;
-            opa_table = _lv_bpp4_opa_table;
-            break;
-        case 8:
-            opa_mask = 0xFF;
-            opa_table = _lv_bpp8_opa_table;
-            break;
-        default:
-            return;
-    }
-    /* Does this work well on big endian systems? */
-    while(cur < src_len) {
-        curbit = 8 - bpp;
-        uint8_t src_byte = src[cur * bpp / 8];
-        while(curbit >= 0 && cur < src_len) {
-            uint8_t src_bits = opa_mask & (src_byte >> curbit);
-            dest[(cur / width * stride) + (cur % width)] = opa_table[src_bits];
-            curbit -= bpp;
-            cur++;
-        }
-    }
 }
 
 lv_draw_sdl_backend_context_t * lv_draw_sdl_get_context()

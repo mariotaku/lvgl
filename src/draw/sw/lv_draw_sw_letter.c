@@ -153,6 +153,47 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_letter(const lv_point_t * pos_p, const lv_
     }
 }
 
+LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_nbpp_to_opa(lv_opa_t * dest, const uint8_t * src, int width, int height,
+                                                  int stride, uint8_t bpp)
+{
+    int src_len = width * height;
+    int cur = 0;
+    int curbit;
+    uint8_t opa_mask;
+    const uint8_t * opa_table;
+    switch(bpp) {
+        case 1:
+            opa_mask = 0x1;
+            opa_table = _lv_bpp1_opa_table;
+            break;
+        case 2:
+            opa_mask = 0x4;
+            opa_table = _lv_bpp2_opa_table;
+            break;
+        case 4:
+            opa_mask = 0xF;
+            opa_table = _lv_bpp4_opa_table;
+            break;
+        case 8:
+            opa_mask = 0xFF;
+            opa_table = _lv_bpp8_opa_table;
+            break;
+        default:
+            return;
+    }
+    /* Does this work well on big endian systems? */
+    while(cur < src_len) {
+        curbit = 8 - bpp;
+        uint8_t src_byte = src[cur * bpp / 8];
+        while(curbit >= 0 && cur < src_len) {
+            uint8_t src_bits = opa_mask & (src_byte >> curbit);
+            dest[(cur / width * stride) + (cur % width)] = opa_table[src_bits];
+            curbit -= bpp;
+            cur++;
+        }
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

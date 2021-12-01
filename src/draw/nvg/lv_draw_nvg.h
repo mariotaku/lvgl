@@ -31,8 +31,7 @@ typedef enum lv_draw_nvg_buffer_index {
     LV_DRAW_NVG_BUFFER_SCREEN = 0,
     LV_DRAW_NVG_BUFFER_FRAME,
     LV_DRAW_NVG_BUFFER_COMPOSITE,
-    LV_DRAW_NVG_BUFFER_MASK_DST,
-    LV_DRAW_NVG_BUFFER_MASK_SRC,
+    LV_DRAW_NVG_BUFFER_MASK,
     LV_DRAW_NVG_BUFFER_COUNT,
 } lv_draw_nvg_buffer_index;
 

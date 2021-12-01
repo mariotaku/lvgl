@@ -161,6 +161,11 @@ lv_draw_sdl_cache_key_head_img_t * lv_nvg_img_cache_key_create(const void * src,
     return (lv_draw_sdl_cache_key_head_img_t *) key;
 }
 
+int lv_nvg_create_alpha_image(lv_opa_t * pixels, lv_coord_t width, lv_coord_t height)
+{
+    return nvgCreateImageAlpha(lv_nvg_context, width, height, 0, pixels);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
