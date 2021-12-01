@@ -38,8 +38,7 @@ typedef enum lv_draw_nvg_buffer_index {
 typedef struct lv_draw_nvg_callbacks_t {
     void (*set_render_buffer)(struct lv_draw_nvg_context_t *context, lv_draw_nvg_buffer_index dst, bool clear);
 
-    void (*fill_buffer)(struct lv_draw_nvg_context_t *context, lv_draw_nvg_buffer_index src, const lv_area_t *a,
-                        bool clear);
+    void (*fill_buffer)(struct lv_draw_nvg_context_t *context, lv_draw_nvg_buffer_index src, const lv_area_t *a);
 
     void (*swap_window)(struct lv_draw_nvg_context_t *context);
 } lv_draw_nvg_callbacks_t;

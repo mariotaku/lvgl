@@ -32,7 +32,7 @@ bool lv_draw_nvg_mask_begin(lv_draw_nvg_context_t *ctx, const lv_area_t *a) {
 void lv_draw_nvg_mask_end(lv_draw_nvg_context_t *ctx, const lv_area_t *a) {
     // Apply mask to composited
     nvgGlobalCompositeBlendFuncSeparate(ctx->nvg, NVG_ZERO, NVG_ONE, NVG_ZERO, NVG_SRC_ALPHA);
-    ctx->callbacks.fill_buffer(ctx, LV_DRAW_NVG_BUFFER_MASK, NULL, false);
+    ctx->callbacks.fill_buffer(ctx, LV_DRAW_NVG_BUFFER_MASK, NULL);
 
     // Restore to last buffer (expect frame)
     lv_draw_nvg_end_frame(ctx);
@@ -40,7 +40,7 @@ void lv_draw_nvg_mask_end(lv_draw_nvg_context_t *ctx, const lv_area_t *a) {
     nvgSave(ctx->nvg);
     nvgScissor(ctx->nvg, a->x1, a->y1, lv_area_get_width(a), lv_area_get_height(a));
     // Blend composited onto frame
-    ctx->callbacks.fill_buffer(ctx, LV_DRAW_NVG_BUFFER_COMPOSITE, NULL, false);
+    ctx->callbacks.fill_buffer(ctx, LV_DRAW_NVG_BUFFER_COMPOSITE, NULL);
     nvgRestore(ctx->nvg);
 }
 
@@ -161,13 +161,13 @@ static void render_texture_mask(lv_draw_nvg_context_t *ctx, const lv_area_t *a) 
                 nvgGlobalCompositeOperation(ctx->nvg, NVG_DESTINATION_IN);
             }
             // Blend composited onto frame
-            ctx->callbacks.fill_buffer(ctx, LV_DRAW_NVG_BUFFER_MASK, NULL, false);
+            ctx->callbacks.fill_buffer(ctx, LV_DRAW_NVG_BUFFER_MASK, NULL);
             lv_draw_nvg_end_frame(ctx);
         }
     }
 
     // Overwrite mask with composite
     lv_draw_nvg_begin_frame(ctx, LV_DRAW_NVG_BUFFER_MASK, true);
-    ctx->callbacks.fill_buffer(ctx, LV_DRAW_NVG_BUFFER_COMPOSITE, NULL, false);
+    ctx->callbacks.fill_buffer(ctx, LV_DRAW_NVG_BUFFER_COMPOSITE, NULL);
     lv_draw_nvg_end_frame(ctx);
 }
