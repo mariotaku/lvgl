@@ -114,20 +114,22 @@ void lv_init(void)
 
     _lv_group_init();
 
-#if LV_USE_GPU_STM32_DMA2D
-    /*Initialize DMA2D GPU*/
-    lv_gpu_stm32_dma2d_init();
-#endif
+    lv_draw_init();
 
-#if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
-    if(lv_gpu_nxp_pxp_init(&pxp_default_cfg) != LV_RES_OK) {
-        LV_LOG_ERROR("PXP init error. STOP.\n");
-        for(; ;) ;
-    }
-#endif
-#if LV_USE_GPU_SDL
-    lv_gpu_sdl_init();
-#endif
+    //#if LV_USE_GPU_STM32_DMA2D
+    //    /*Initialize DMA2D GPU*/
+    //    lv_gpu_stm32_dma2d_init();
+    //#endif
+    //
+    //#if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
+    //    if(lv_gpu_nxp_pxp_init(&pxp_default_cfg) != LV_RES_OK) {
+    //        LV_LOG_ERROR("PXP init error. STOP.\n");
+    //        for(; ;) ;
+    //    }
+    //#endif
+    //#if LV_USE_GPU_SDL
+    //    lv_gpu_sdl_init();
+    //#endif
 
     _lv_obj_style_init();
     _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
@@ -237,6 +239,7 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
     if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2))) {
         lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
+        lv_obj_mark_layout_as_dirty(obj);
     }
 
     if(f & LV_OBJ_FLAG_SCROLLABLE) {
@@ -265,6 +268,7 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
         lv_obj_invalidate(obj);
         if(lv_obj_is_layout_positioned(obj)) {
             lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
+            lv_obj_mark_layout_as_dirty(obj);
         }
     }
 

@@ -219,16 +219,16 @@
  * Others
  *-----------*/
 
-/*1: Show CPU usage and FPS count in the right bottom corner*/
+/*1: Show CPU usage and FPS count*/
 #define LV_USE_PERF_MONITOR 0
 #if LV_USE_PERF_MONITOR
     #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
 #endif
 
-/*1: Show the used memory and the memory fragmentation in the left bottom corner
+/*1: Show the used memory and the memory fragmentation
  * Requires LV_MEM_CUSTOM = 0*/
 #define LV_USE_MEM_MONITOR 0
-#if LV_USE_PERF_MONITOR
+#if LV_USE_MEM_MONITOR
     #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
 #endif
 
@@ -484,6 +484,8 @@
 
 #define LV_USE_LIST       1
 
+#define LV_USE_MENU       1
+
 #define LV_USE_METER      1
 
 #define LV_USE_MSGBOX     1
@@ -576,6 +578,16 @@
 #if LV_USE_FREETYPE
     /*Memory used by FreeType to cache characters [bytes] (-1: no caching)*/
     #define LV_FREETYPE_CACHE_SIZE (16 * 1024)
+    #if LV_FREETYPE_CACHE_SIZE >= 0
+        /* 1: bitmap cache use the sbit cache, 0:bitmap cache use the image cache. */
+        /* sbit cache:it is much more memory efficient for small bitmaps(font size < 256) */
+        /* if font size >= 256, must be configured as image cache */
+        #define LV_FREETYPE_SBIT_CACHE 0
+        /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
+        /* (0:use system defaults) */
+        #define LV_FREETYPE_CACHE_FT_FACES 0
+        #define LV_FREETYPE_CACHE_FT_SIZES 0
+    #endif
 #endif
 
 /*Rlottie library*/

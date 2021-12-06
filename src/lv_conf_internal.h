@@ -594,7 +594,7 @@
  * Others
  *-----------*/
 
-/*1: Show CPU usage and FPS count in the right bottom corner*/
+/*1: Show CPU usage and FPS count*/
 #ifndef LV_USE_PERF_MONITOR
     #ifdef CONFIG_LV_USE_PERF_MONITOR
         #define LV_USE_PERF_MONITOR CONFIG_LV_USE_PERF_MONITOR
@@ -612,7 +612,7 @@
     #endif
 #endif
 
-/*1: Show the used memory and the memory fragmentation in the left bottom corner
+/*1: Show the used memory and the memory fragmentation
  * Requires LV_MEM_CUSTOM = 0*/
 #ifndef LV_USE_MEM_MONITOR
     #ifdef CONFIG_LV_USE_MEM_MONITOR
@@ -621,7 +621,7 @@
         #define LV_USE_MEM_MONITOR 0
     #endif
 #endif
-#if LV_USE_PERF_MONITOR
+#if LV_USE_MEM_MONITOR
     #ifndef LV_USE_MEM_MONITOR_POS
         #ifdef CONFIG_LV_USE_MEM_MONITOR_POS
             #define LV_USE_MEM_MONITOR_POS CONFIG_LV_USE_MEM_MONITOR_POS
@@ -1551,6 +1551,18 @@
     #endif
 #endif
 
+#ifndef LV_USE_MENU
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_MENU
+            #define LV_USE_MENU CONFIG_LV_USE_MENU
+        #else
+            #define LV_USE_MENU 0
+        #endif
+    #else
+        #define LV_USE_MENU       1
+    #endif
+#endif
+
 #ifndef LV_USE_METER
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_METER
@@ -1865,6 +1877,34 @@
             #define LV_FREETYPE_CACHE_SIZE CONFIG_LV_FREETYPE_CACHE_SIZE
         #else
             #define LV_FREETYPE_CACHE_SIZE (16 * 1024)
+        #endif
+    #endif
+    #if LV_FREETYPE_CACHE_SIZE >= 0
+        /* 1: bitmap cache use the sbit cache, 0:bitmap cache use the image cache. */
+        /* sbit cache:it is much more memory efficient for small bitmaps(font size < 256) */
+        /* if font size >= 256, must be configured as image cache */
+        #ifndef LV_FREETYPE_SBIT_CACHE
+            #ifdef CONFIG_LV_FREETYPE_SBIT_CACHE
+                #define LV_FREETYPE_SBIT_CACHE CONFIG_LV_FREETYPE_SBIT_CACHE
+            #else
+                #define LV_FREETYPE_SBIT_CACHE 0
+            #endif
+        #endif
+        /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
+        /* (0:use system defaults) */
+        #ifndef LV_FREETYPE_CACHE_FT_FACES
+            #ifdef CONFIG_LV_FREETYPE_CACHE_FT_FACES
+                #define LV_FREETYPE_CACHE_FT_FACES CONFIG_LV_FREETYPE_CACHE_FT_FACES
+            #else
+                #define LV_FREETYPE_CACHE_FT_FACES 0
+            #endif
+        #endif
+        #ifndef LV_FREETYPE_CACHE_FT_SIZES
+            #ifdef CONFIG_LV_FREETYPE_CACHE_FT_SIZES
+                #define LV_FREETYPE_CACHE_FT_SIZES CONFIG_LV_FREETYPE_CACHE_FT_SIZES
+            #else
+                #define LV_FREETYPE_CACHE_FT_SIZES 0
+            #endif
         #endif
     #endif
 #endif
