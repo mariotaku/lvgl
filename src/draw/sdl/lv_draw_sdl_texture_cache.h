@@ -34,6 +34,8 @@ extern "C" {
 typedef struct {
     char head[8];
     SDL_Texture * texture;
+    bool texture_managed;
+    bool texture_referenced;
 } lv_draw_sdl_dec_dsc_userdata_t;
 
 typedef enum {

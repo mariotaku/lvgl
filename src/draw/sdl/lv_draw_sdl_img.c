@@ -64,8 +64,12 @@ lv_res_t lv_draw_sdl_img_core(const lv_area_t * coords, const lv_area_t * mask, 
         if(cdsc) {
             lv_img_decoder_dsc_t * dsc = &cdsc->dec_dsc;
             if(dsc->user_data && SDL_memcmp(dsc->user_data, LV_DRAW_SDL_DEC_DSC_TEXTURE_HEAD, 8) == 0) {
-                texture = ((lv_draw_sdl_dec_dsc_userdata_t *) dsc->user_data)->texture;
-                tex_flags |= LV_DRAW_SDL_CACHE_FLAG_MANAGED;
+                lv_draw_sdl_dec_dsc_userdata_t *ptr = (lv_draw_sdl_dec_dsc_userdata_t *) dsc->user_data;
+                texture = ptr->texture;
+                if (ptr->texture_managed) {
+                    tex_flags |= LV_DRAW_SDL_CACHE_FLAG_MANAGED;
+                }
+                ptr->texture_referenced = true;
             }
             else {
                 texture = upload_img_texture(renderer, dsc);
