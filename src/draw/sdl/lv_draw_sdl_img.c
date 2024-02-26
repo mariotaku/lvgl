@@ -347,7 +347,7 @@ static void draw_img_rounded(lv_draw_sdl_ctx_t * ctx, SDL_Texture * texture, con
     /* Draw 3 parts */
     lv_area_t clip_tmp, part;
     calc_draw_part(texture, header, coords, NULL, &src_rect, &dst_rect);
-    for(int i = w > h ? ROUNDED_IMG_PART_LEFT : ROUNDED_IMG_PART_TOP, j = i + 3; i <= j; i++) {
+    for(int i = w > h ? ROUNDED_IMG_PART_LEFT : ROUNDED_IMG_PART_TOP, j = i + 3; i < j; i++) {
         switch(i) {
             case ROUNDED_IMG_PART_LEFT:
                 lv_area_set(&part, coords->x1, coords->y1 + radius, coords->x1 + radius - 1, coords->y2 - radius);
