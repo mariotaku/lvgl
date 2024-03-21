@@ -250,7 +250,10 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords)
     SDL_Rect rect = {0, 0, w, h};
     uint8_t * pixels;
     int pitch;
+    Uint32 format;
+    if(SDL_QueryTexture(texture, &format, NULL, NULL, NULL) != 0) return;
     if(SDL_LockTexture(texture, &rect, (void **) &pixels, &pitch) != 0) return;
+    SDL_PixelFormat *sdl_format = SDL_AllocFormat(format);
 
     lv_opa_t * line_buf = lv_mem_buf_get(rect.w);
     for(lv_coord_t y = 0; y < rect.h; y++) {
@@ -267,11 +270,12 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords)
         else {
             for(int x = 0; x < rect.w; x++) {
                 const size_t idx = y * pitch + x * 4;
-                pixels[idx] = line_buf[x];
-                pixels[idx + 1] = pixels[idx + 2] = pixels[idx + 3] = 0xFF;
+                uint8_t * pixel = &pixels[idx];
+                *((uint32_t *) pixel) = SDL_MapRGBA(sdl_format, 0xFF, 0xFF, 0xFF, line_buf[x]);
             }
         }
     }
+    SDL_FreeFormat(sdl_format);
     lv_mem_buf_release(line_buf);
     SDL_UnlockTexture(texture);
 }

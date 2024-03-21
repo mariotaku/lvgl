@@ -156,7 +156,10 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords, const in
     SDL_Rect rect = {0, 0, w, h};
     uint8_t * pixels;
     int pitch;
+    Uint32 format;
+    if(SDL_QueryTexture(texture, &format, NULL, NULL, NULL) != 0) return;
     if(SDL_LockTexture(texture, &rect, (void **) &pixels, &pitch) != 0) return;
+    SDL_PixelFormat *sdl_format = SDL_AllocFormat(format);
 
     lv_opa_t * line_buf = lv_mem_buf_get(rect.w);
     for(lv_coord_t y = 0; y < rect.h; y++) {
@@ -172,9 +175,8 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords, const in
         }
         else {
             for(int x = 0; x < rect.w; x++) {
-                uint8_t * pixel = &pixels[y * pitch + x * 4];
-                *pixel = line_buf[x];
-                pixel[1] = pixel[2] = pixel[3] = 0xFF;
+                uint32_t *pixel = (uint32_t *) &pixels[y * pitch + x * 4];
+                *pixel = SDL_MapRGBA(sdl_format, 0xFF, 0xFF, 0xFF, line_buf[x]);
             }
         }
         if(caps) {
@@ -189,15 +191,16 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords, const in
                 }
                 else {
                     for(int x = 0; x < rect.w; x++) {
-                        uint8_t * pixel = &pixels[y * pitch + x * 4];
-                        uint16_t old_opa = line_buf[x] + *pixel;
-                        *pixel = LV_MIN(old_opa, 0xFF);
-                        pixel[1] = pixel[2] = pixel[3] = 0xFF;
+                        uint32_t *pixel = (uint32_t *) &pixels[y * pitch + x * 4];
+                        uint16_t old_opa = (*pixel & sdl_format->Amask) >> sdl_format->Ashift;
+
+                        *((uint32_t *) pixel) = SDL_MapRGBA(sdl_format, 0xFF, 0xFF, 0xFF, LV_MIN(old_opa + line_buf[x], 0xFF));
                     }
                 }
             }
         }
     }
+    SDL_FreeFormat(sdl_format);
     lv_mem_buf_release(line_buf);
     SDL_UnlockTexture(texture);
 }
